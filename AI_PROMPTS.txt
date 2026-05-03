@@ -54,3 +54,21 @@ Make sure to add a `README.md` in that folder explaining how the tunnel works."
 
 **AI Assistant:**
 "I have audited the code. The Python dependencies correctly isolate the user scope, the Pytest coverage validates the HTTP 403 responses, and the frontend gracefully handles forbidden states without failing silently. The database seeder in `initial_data.py` has been updated to provision `admin@example.com`, `manager@example.com`, and `member@example.com` on first run. The repository is ready."
+---
+
+### Prompt 5: Addressing Technical Feedback
+**Developer:**
+"I've received technical feedback on the previous submission. There were three main issues: 
+1. Missing Alembic migrations. 
+2. Redundant `is_superuser` field alongside the `role` enum. 
+3. CI workflows not triggering on my fork.
+
+Let's fix these immediately:
+- Refactor the codebase to completely remove `is_superuser` from models, crud, dependencies, and the frontend. Ensure the `role` enum is the single source of truth.
+- Generate a new Alembic migration that reflects these schema changes.
+- Update the GitHub Action workflows (`test-backend.yml`, etc.) to include a `workflow_dispatch` trigger and ensure they run on the `main` branch.
+- Update the frontend components (`AddUser`, `EditUser`, `columns`) to use the new role system and remove all references to superuser.
+Verify everything with a clean `docker compose up` to ensure end-to-end functionality."
+
+**AI Assistant:**
+"I have completed the refactor. `is_superuser` is removed from all layers. A new Alembic migration `migrate_rbac.py` has been generated. The GitHub Actions now support manual triggers and will run on your `main` branch. The frontend UI has been updated to provide a `role` selection input instead of a superuser checkbox. The project is now fully verifiable and production-ready."
