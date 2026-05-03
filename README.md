@@ -1,5 +1,40 @@
 # Full Stack FastAPI Template
 
+## Fullstack-Dev-Test-Task
+
+### Permission Matrix
+| Action | admin | manager | member |
+|---|---|---|---|
+| List all users | ✓ | ✓ | ✗ |
+| Create user | ✓ | ✗ | ✗ |
+| View metrics | ✓ | ✓ | ✗ |
+| Update own profile | ✓ | ✓ | ✓ |
+| Update any profile | ✓ | ✗ | ✗ |
+
+### Infrastructure Task
+
+The "one click script to deploy ghost blog platform at a Hetzner VPS with no public SSH access, only through tunnels" can be found in the [`infrastructure`](./infrastructure/) directory. Please read [`infrastructure/README.md`](./infrastructure/README.md) for full deployment instructions and architecture details.
+
+### Architecture Decision Record (ADR): RBAC Implementation
+**Problem:** Need to implement Role-Based Access Control (RBAC) across the stack.  
+**Decision:** 
+- **Database:** Added an Enum `role` (`admin`, `manager`, `member`) to the `User` model, defaulting to `member`.
+- **Backend:** Created a FastAPI dependency `RequireRole` class in `deps.py`. It accepts a list of allowed roles and checks the `current_user.role`. This provides clear, declarative protection on endpoints (e.g. `Depends(RequireRole(["admin", "manager"]))`).
+- **Frontend:** Updated user types to include `role` and used TanStack Router's `beforeLoad` checks along with React hooks to conditionally render navigation links and protect routes.
+
+**Trade-offs:** 
+- Opted for a simple Enum string comparison instead of a complex granular permissions table (e.g. Casbin) to keep the scope tight and maintainability high.
+- Kept `is_superuser` alongside `role` to minimize breaking changes to the base template, but mapped administrative capabilities cleanly to the `admin` role.
+
+### Setup Instructions
+1. Clone the repository and navigate into the directory.
+2. Run `docker compose up -d` to spin up the PostgreSQL database, Backend API, and Frontend Vite server.
+3. The initial seed script automatically creates three test users:
+   - `admin@example.com` (password: `changethis`) - Admin role
+   - `manager@example.com` (password: `changethis`) - Manager role
+   - `member@example.com` (password: `changethis`) - Member role
+4. Access the frontend at `http://localhost:5173` to test the RBAC features.
+
 <a href="https://github.com/fastapi/full-stack-fastapi-template/actions?query=workflow%3A%22Test+Docker+Compose%22" target="_blank"><img src="https://github.com/fastapi/full-stack-fastapi-template/workflows/Test%20Docker%20Compose/badge.svg" alt="Test Docker Compose"></a>
 <a href="https://github.com/fastapi/full-stack-fastapi-template/actions?query=workflow%3A%22Test+Backend%22" target="_blank"><img src="https://github.com/fastapi/full-stack-fastapi-template/workflows/Test%20Backend/badge.svg" alt="Test Backend"></a>
 <a href="https://coverage-badge.samuelcolvin.workers.dev/redirect/fastapi/full-stack-fastapi-template" target="_blank"><img src="https://coverage-badge.samuelcolvin.workers.dev/fastapi/full-stack-fastapi-template.svg" alt="Coverage"></a>

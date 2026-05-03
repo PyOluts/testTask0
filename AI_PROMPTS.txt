@@ -1,0 +1,56 @@
+# AI Collaboration Log
+
+The following is a transcript of the prompts and interactions used with the AI coding assistant to accelerate the implementation of the full-stack RBAC features and the Hetzner infrastructure deployment script.
+
+---
+
+### Prompt 1: Initializing the RBAC Architecture
+**Developer:** 
+"I need to implement Role-Based Access Control (RBAC) in this FastAPI + React template. We need three roles: `admin`, `manager`, and `member`. 
+Please:
+1. Update the SQLModel `User` class to include a `role` Enum defaulting to `member`.
+2. Create a clean FastAPI dependency (e.g., `RequireRole`) in `deps.py` that checks the `current_user.role`.
+3. Protect the following API endpoints: `GET /users` (admin, manager), `POST /users` (admin), and a new `GET /metrics` stub (admin, manager). 
+4. In the React frontend, update the TypeScript types, and use TanStack Router's `beforeLoad` guards to conditionally redirect unauthorized users. Hide restricted sidebar links.
+Let's prioritize clean, declarative code over over-engineering. No complex Casbin policies, just simple enum checks."
+
+**AI Assistant:** 
+"Understood. I've updated the `models.py` to include the `UserRole` Enum. I created a parameterized dependency `RequireRole(allowed_roles: list[str])` in `deps.py`. I've applied these dependencies to the `users.py` and a new `metrics.py` router. On the frontend, I've updated the client types, modified `AppSidebar.tsx` to conditionally render items based on `currentUser.role`, and added `beforeLoad` checks to the TanStack routes to throw a `redirect` to a forbidden page if permissions aren't met."
+
+---
+
+### Prompt 2: Refining Tests and Documentation
+**Developer:**
+"Excellent. Now let's write focused backend tests for these authorization paths. Write Pytest cases in `test_rbac.py` that specifically verify:
+- A member cannot access the `/users` list (expect 403 Forbidden).
+- A manager can access `/users` but cannot `POST` to create a new user.
+- An admin can do both.
+Once the tests are passing, update the main `README.md`. Include a Permission Matrix table and a short Architecture Decision Record (ADR) explaining our choice of route-level dependencies and frontend route guards."
+
+**AI Assistant:**
+"I've written the `test_rbac.py` file covering those exact access control scenarios. All tests pass. I've also appended the Permission Matrix and the ADR to the `README.md`, detailing the trade-offs of using a simple Enum versus a complex ACL table, noting that it optimizes for maintainability and the 1-hour timebox."
+
+---
+
+### Prompt 3: Infrastructure / Platform Task
+**Developer:**
+"Now let's tackle the infrastructure task: 'Develop a one-click script to deploy Ghost blog platform at a Hetzner VPS with no public SSH access, only through tunnels'. 
+My architectural approach: We will use the Hetzner `hcloud` CLI combined with `cloud-init`. 
+Please write a `deploy.sh` script and a `cloud-init.template.yaml` in an `infrastructure/` folder. 
+The cloud-init should:
+1. Use `ufw` to block public port 22 and allow 80/443.
+2. Install Docker and set up Ghost via Docker Compose.
+3. Install Tailscale. Run `tailscale up --ssh` using an injected auth key, so SSH is completely hidden from the public internet and only accessible via the Tailscale tunnel.
+Make sure to add a `README.md` in that folder explaining how the tunnel works."
+
+**AI Assistant:**
+"I've created the `infrastructure/` directory containing `deploy.sh`, `cloud-init.template.yaml`, and `README.md`. The deployment script takes the Hetzner and Tailscale tokens via environment variables, injects them into the cloud-init template, and spins up the VPS. The server boots, UFW immediately secures port 22, and Ghost is served on port 80 while SSH remains accessible exclusively through the Tailscale network interface. I've also linked this new folder from your main `README.md`."
+
+---
+
+### Prompt 4: Final Polish
+**Developer:**
+"Looks solid. Please review the codebase to ensure there are no obvious security gaps, privilege escalations, or linting errors in both the Python backend and React frontend. Ensure the user seeds script successfully provisions users for all three roles."
+
+**AI Assistant:**
+"I have audited the code. The Python dependencies correctly isolate the user scope, the Pytest coverage validates the HTTP 403 responses, and the frontend gracefully handles forbidden states without failing silently. The database seeder in `initial_data.py` has been updated to provision `admin@example.com`, `manager@example.com`, and `member@example.com` on first run. The repository is ready."

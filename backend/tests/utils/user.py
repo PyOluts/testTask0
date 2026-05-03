@@ -19,10 +19,10 @@ def user_authentication_headers(
     return headers
 
 
-def create_random_user(db: Session) -> User:
+def create_random_user(db: Session, role: str = "member") -> User:
     email = random_email()
     password = random_lower_string()
-    user_in = UserCreate(email=email, password=password)
+    user_in = UserCreate(email=email, password=password, role=role)
     user = crud.create_user(session=db, user_create=user_in)
     return user
 
