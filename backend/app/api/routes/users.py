@@ -8,7 +8,6 @@ from app import crud
 from app.api.deps import (
     CurrentUser,
     SessionDep,
-    get_current_active_superuser,
     RequireRole,
 )
 from app.core.config import settings
@@ -135,7 +134,7 @@ def delete_user_me(session: SessionDep, current_user: CurrentUser) -> Any:
     """
     Delete own user.
     """
-    if current_user.is_superuser:
+    if current_user.role == "admin":
         raise HTTPException(
             status_code=403, detail="Super users are not allowed to delete themselves"
         )

@@ -28,7 +28,6 @@ def init_db(session: Session) -> None:
         user_in = UserCreate(
             email=settings.FIRST_SUPERUSER,
             password=settings.FIRST_SUPERUSER_PASSWORD,
-            is_superuser=True,
             role="admin",
         )
         user = crud.create_user(session=session, user_create=user_in)
@@ -40,7 +39,6 @@ def init_db(session: Session) -> None:
         manager_in = UserCreate(
             email="manager@example.com",
             password="changethis",
-            is_superuser=False,
             role="manager",
         )
         crud.create_user(session=session, user_create=manager_in)
@@ -52,7 +50,6 @@ def init_db(session: Session) -> None:
         member_in = UserCreate(
             email="member@example.com",
             password="changethis",
-            is_superuser=False,
             role="member",
         )
         crud.create_user(session=session, user_create=member_in)

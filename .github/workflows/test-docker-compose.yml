@@ -1,9 +1,11 @@
 name: Test Docker Compose
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
+      - main
   pull_request:
     types:
       - opened
